@@ -1,6 +1,7 @@
 package com.example.cool_weather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -289,8 +290,17 @@ public class WeatherActivity extends AppCompatActivity {
 
         weatherLayout.setVisibility(View.VISIBLE);
 
+        if(weather != null && "ok".equals(weather.status)){
+            Intent intent = new Intent(this,AutoUpdateService.class);
+            startService(intent);
+            //Toast.makeText(WeatherActivity.this,"已开启后台更新天气",Toast.LENGTH_SHORT).show();
+
+        }else {
+            Toast.makeText(WeatherActivity.this,"更新天气信息失败",Toast.LENGTH_SHORT).show();
+        }
 
     }
+
 
 
 }
