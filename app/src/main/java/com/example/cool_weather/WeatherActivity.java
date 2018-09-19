@@ -1,6 +1,7 @@
 package com.example.cool_weather;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,6 +70,8 @@ public class WeatherActivity extends AppCompatActivity {
     public DrawerLayout drawerLayout;
 
     private Button navButton;
+
+    private int choose_service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +157,40 @@ public class WeatherActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+
+
+    }
+
+    private void initChooseService() {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String weatherString = prefs.getString("weather",null);
+
+        if(weatherString != null){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(WeatherActivity.this);
+            builder.setIcon(R.drawable.alarm);
+            builder.setTitle("温馨提示");
+            builder.setMessage("是否开启自动更新");
+            builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Intent intent = new Intent(WeatherActivity.this,AutoUpdateService.class);
+                    startService(intent);
+                    Toast.makeText(WeatherActivity.this,"已开启后台更新天气",Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.setNegativeButton("否", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Toast.makeText(WeatherActivity.this,"已关闭后台更新天气",Toast.LENGTH_SHORT).show();
+
+                }
+            });
+            builder.show();
+
+        }
 
     }
 
@@ -290,14 +328,7 @@ public class WeatherActivity extends AppCompatActivity {
 
         weatherLayout.setVisibility(View.VISIBLE);
 
-        if(weather != null && "ok".equals(weather.status)){
-            Intent intent = new Intent(this,AutoUpdateService.class);
-            startService(intent);
-            //Toast.makeText(WeatherActivity.this,"已开启后台更新天气",Toast.LENGTH_SHORT).show();
-
-        }else {
-            Toast.makeText(WeatherActivity.this,"更新天气信息失败",Toast.LENGTH_SHORT).show();
-        }
+        initChooseService();
 
     }
 
